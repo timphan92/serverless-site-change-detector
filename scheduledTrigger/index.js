@@ -10,8 +10,6 @@ module.exports = async function(context, myTimer) {
     context.log("JavaScript is running late!");
   }
   const target = await targetDocument();
-  console.log("result");
-  console.log(target);
   // const scan = scanDocument();
   context.log("JavaScript timer trigger function ran successfully!", timeStamp);
 };
@@ -47,8 +45,6 @@ async function targetDocument() {
 async function scanDocument() {
   const $ = await fetchData();
   const htmlDocument = $.html();
-  console.log("scan");
-  // console.log(htmlDocument);
   return "";
 }
 
