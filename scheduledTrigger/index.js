@@ -1,7 +1,8 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
+const sgMail = require("@sendgrid/mail");
 
-const _SITEURL_ = "https://wahlinfastigheter.se/lediga-objekt/lagenheter/";
+const _SITEURL_ = "yoursiteurl";
 
 module.exports = async function(context, myTimer) {
   var timeStamp = new Date().toISOString();
@@ -10,9 +11,26 @@ module.exports = async function(context, myTimer) {
     context.log("JavaScript is running late!");
   }
   const target = await targetDocument();
-  // const scan = scanDocument();
-  context.log("JavaScript timer trigger function ran successfully!", timeStamp);
+  if (target.availableApartments > 0) {
+    context.log("Trigger function found available apartments!", timeStamp);
+    sendMail(target);
+  }
 };
+
+// example for sending mail with sendgrid
+function sendMail(target) {
+  sgMail.setApiKey(
+    "" // Use your API-key here or store it in .env
+  );
+  const msg = {
+    to: "yourmail",
+    from: "frommail",
+    subject: "subject",
+    text: `Available apartments: ${target.availableApartments}`,
+    html: `<div><h3>Available apartments: ${target.availableApartments}</h3><p>Link: https://alinkhere.se</p></div>`
+  };
+  sgMail.send(msg);
+}
 
 // Scan document with cheerio
 async function targetDocument() {
@@ -41,17 +59,10 @@ async function targetDocument() {
   });
 }
 
-// Scan the document body using for example regEx
-async function scanDocument() {
-  const $ = await fetchData();
-  const htmlDocument = $.html();
-  return "";
-}
-
 // Fetch site and load with cheerio
 const fetchData = async () => {
   const result = await axios.get(_SITEURL_);
   return cheerio.load(result.data);
 };
 
-// "0 35 13 * * 1-5"
+//
